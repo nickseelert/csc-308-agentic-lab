@@ -20,6 +20,7 @@ def build(out_dir: Path = DEFAULT_OUT) -> list[Path]:
     payloads = {
         "summary.json": metrics.summary(df) | {"whiff_rate": round(metrics.whiff_rate(df), 4)},
         "velocity_leaders.json": metrics.velocity_leaders(df),
+        "strikeout_leaders.json": metrics.strikeout_leaders(df),
         "pitch_mix.json": metrics.pitch_mix(df),
         "hardest_hit.json": metrics.hardest_hit(df),
     }
