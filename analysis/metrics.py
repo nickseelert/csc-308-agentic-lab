@@ -14,6 +14,7 @@ SWINGS = {
     "missed_bunt",
 }
 WHIFFS = {"swinging_strike", "swinging_strike_blocked", "foul_tip", "missed_bunt"}
+K_EVENTS = {"strikeout", "strikeout_double_play"}
 
 
 def summary(df: pd.DataFrame) -> dict:
@@ -49,6 +50,35 @@ def velocity_leaders(df: pd.DataFrame, n: int = 10, min_pitches: int = 25) -> li
             "avg_velo": round(float(row["mean"]), 1),
             "max_velo": round(float(row["max"]), 1),
             "pitches": int(row["size"]),
+        }
+        for (_, name), row in grouped.iterrows()
+    ]
+
+
+def strikeout_leaders(df: pd.DataFrame, n: int = 10) -> list[dict]:
+    """Pitchers ranked by strikeouts.
+
+    K is the terminal ``strikeout`` and ``strikeout_double_play`` events; batters
+    faced (BF) is every non-null terminal event, i.e. one completed plate
+    appearance, not one row per pitch. Pitchers without a K are left out.
+    """
+    appearances = df[df["events"].notna()].copy()
+    if appearances.empty:
+        return []
+    appearances["is_k"] = appearances["events"].isin(K_EVENTS).astype(int)
+    grouped = appearances.groupby(["pitcher", "pitcher_name"]).agg(
+        strikeouts=("is_k", "sum"),
+        batters_faced=("is_k", "size"),
+    )
+    grouped = grouped[grouped["strikeouts"] > 0]
+    grouped = grouped.sort_values(
+        ["strikeouts", "pitcher_name", "pitcher"], ascending=[False, True, True]
+    ).head(n)
+    return [
+        {
+            "pitcher": str(name),
+            "strikeouts": int(row["strikeouts"]),
+            "batters_faced": int(row["batters_faced"]),
         }
         for (_, name), row in grouped.iterrows()
     ]

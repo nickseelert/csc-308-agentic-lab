@@ -1,5 +1,5 @@
 import PitchMixChart from "@/components/PitchMixChart";
-import { hardestHit, pitchMix, summary, velocityLeaders } from "@/lib/data";
+import { hardestHit, pitchMix, strikeoutLeaders, summary, velocityLeaders } from "@/lib/data";
 
 export default function Home() {
   const s = summary;
@@ -36,6 +36,27 @@ export default function Home() {
               <td className="num">{r.avg_velo}</td>
               <td className="num">{r.max_velo}</td>
               <td className="num">{r.pitches}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h2>Strikeout leaders (top 10)</h2>
+      <p className="lede">
+        K counts strikeouts, including strikeout double plays. BF is batters faced: completed plate
+        appearances, not individual pitches. Figures cover the committed 2026 postseason snapshot
+        only, not live results.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Pitcher</th><th className="num">K</th><th className="num">BF</th></tr>
+        </thead>
+        <tbody>
+          {strikeoutLeaders.map((r, i) => (
+            <tr key={`${r.pitcher}-${i}`}>
+              <td>{r.pitcher}</td>
+              <td className="num">{r.strikeouts}</td>
+              <td className="num">{r.batters_faced}</td>
             </tr>
           ))}
         </tbody>
